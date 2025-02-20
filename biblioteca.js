@@ -8,6 +8,8 @@ let usuarios = [];
 
 let emprestAtivos = [];
 
+let devolucoes = [];
+
 async function sistemaBiblioteca () {
 
 while (true) {
@@ -35,7 +37,7 @@ while (true) {
                         break;
 
                         case "3":
-                            // registrar devolucao
+                            await registrarDevolucao ();
                             break;
 
                             case "4":
@@ -158,9 +160,68 @@ async function fazerEmprestimo(){
 };
 
 async function registrarDevolucao (){
-    let confirmUsuario = prompt ("Usuário:");
-    let confirmLivro = prompt ("Livro:");
-    let dataDevolucao = prompt ("Data da devolução:");
-
+    const file = Bun.file ("usuarios.json");
+    const fileExist = await file.exists ();
     
+    if (fileExist){
+        usuarios = await file.json ();
+    };
+
+    let confirmUsuario = prompt ("Usuário:");
+    let usuarioEncontrado = usuarios.find (usuario => usuario.nome === confirmUsuario);
+
+    if (usuarioEncontrado){
+        console.log ("Usuário encontrado!");
+
+        const file = Bun.file ("livros.json");
+        const fileExist = await file.exists ();
+
+        if (fileExist){
+            livros = await file.json ();
+        };
+
+        let confirmLivro = prompt ("Livro:");
+        let livroDisponivel = livros.find (livro => livro.titulo === confirmLivro);
+
+        if (livroDisponivel){
+            const data = new Date ();
+            data.setDate (data.getDate ());
+            data.toLocaleDateString ("pt-BR");
+            console.log ("Devolvido em:" + data);
+
+            let devolucao = {
+            livro: confirmLivro,
+            usuario: usuarioEncontrado, 
+            data: data
+            }; 
+
+            const file = Bun.file ("devolucoes.json");
+            const fileExist = await file.exists ();
+
+            if (fileExist){
+            devolucoes = await file.json ();
+            };
+
+            devolucoes.push (devolucao);
+            await Bun.write ("devolucoes.json", JSON.stringify (devolucoes));
+
+            console.log ("Devolução concluída!");
+        } else {
+            console.log ("Livro não encontrado!")
+        };       
+    } else {
+        console.log ("Usuario não encontrado!")
+    };
+    
+};
+
+async function exibirRelatorios (){
+    let menuDeRelatios = prompt (`
+        0 - Livors disponíveis.
+        1 - Empréstimos ativos.
+        2 - Usuários cadastrados.
+        3 - empréstimos concluídos.
+        `);
+
+
 }
