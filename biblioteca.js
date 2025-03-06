@@ -12,15 +12,17 @@ let devolucoes = [];
 
 async function sistemaBiblioteca () {
 
-while (true) {
-    let menu = prompt (`
+    while (true) {
+        let menu = prompt (`
         O que deseja fazer?
         0 - Cadastrar livro.
         1 - Cadastrar usuários.
         2 - Registrar empréstimo.
         3 - Registar devolução.
-        4 - Relatórios.
-        5 - Sair.
+        4 - Livros Disponíveis.
+        5 - Empréstimos Ativos.
+        6 - Devoluções concluídas.
+        7 - Sair.
         `);
         
         switch (menu){
@@ -41,10 +43,19 @@ while (true) {
                             break;
 
                             case "4":
-                                //relatorios
+                                await exibirLivrosDisponiveis();
                                 break;
+                                
                                 case "5":
-                                    return;
+                                    await exibirEmprestAtivos();
+                                    break;
+
+                                    case "6":
+                                        await exibirDevolucoes();
+                                        break;
+
+                                        case "7":
+                                            return;
         };
     };
 };
@@ -215,13 +226,35 @@ async function registrarDevolucao (){
     
 };
 
-async function exibirRelatorios (){
-    let menuDeRelatios = prompt (`
-        0 - Livors disponíveis.
-        1 - Empréstimos ativos.
-        2 - Usuários cadastrados.
-        3 - empréstimos concluídos.
-        `);
+async function exibirLivrosDisponiveis(){
+    const file = Bun.file("livros.json");
+    const fileExist = await file.exists();
 
+    if(fileExist){
+        livros = await file.json();
+    };
 
-}
+    console.table (livros);
+};
+
+async function exibirEmprestAtivos(){
+    const file = Bun.file("emprestAtivos.json");
+    const fileExist = await file.exists();
+
+    if(fileExist){
+        emprestAtivos = await file.json();
+    };
+
+    console.table(emprestAtivos);
+};
+
+async function exibirDevolucoes(){
+    const file = Bun.file("devolucoes.json");
+    const fileExist = await file.exists();
+
+    if(fileExist){
+        devolucoes = await file.json();
+    };
+
+    console.table(devolucoes);
+};
